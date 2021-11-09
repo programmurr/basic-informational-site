@@ -1,27 +1,24 @@
 const https = require('http');
 const fs = require('fs');
 
-const index = fs.readFileSync('index.html');
-const about = fs.readFileSync('about.html');
-const contactMe = fs.readFileSync('contact-me.html');
-const notFound = fs.readFileSync('404.html');
-
 const port = 3000;
 
 const server = https.createServer((req, res) => {
-  const url = req.url.slice(1);
-  if (url === "") {
+  if (req.url === '/' || req.url.includes('index.html')) {
+    const file = fs.readFileSync('./pages/index.html');
     res.writeHead(200, 'Content-Type', 'text/html');
-    res.end(index);
-  } else if (url === "about") {
-    res.writeHead(200, 'Content-Type', 'text/html');
-    res.end(about);
-  } else if (url === "contact-me") {
-    res.writeHead(200, 'Content-Type', 'text/html');
-    res.end(contactMe);
+    res.write(file);
+    res.end();
+  } else if (req.url.includes('css')) {
+    const file = fs.readFileSync('.' + req.url);
+    res.writeHead(200, 'Content-Type', 'text/css');
+    res.write(file);
+    res.end();
   } else {
-    res.writeHead(404, 'Content-Type', 'text/html');
-    res.end(notFound);
+    const file = fs.readFileSync('./pages/' + (req.url.slice(1)));
+    res.writeHead(200, 'Content-Type', 'text/html');
+    res.write(file);
+    res.end();
   }
 });
 
