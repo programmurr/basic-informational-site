@@ -15,10 +15,17 @@ const server = https.createServer((req, res) => {
     res.write(file);
     res.end();
   } else {
-    const file = fs.readFileSync('./pages/' + (req.url.slice(1)));
-    res.writeHead(200, 'Content-Type', 'text/html');
-    res.write(file);
-    res.end();
+    try {
+      const file = fs.readFileSync('./pages/' + (req.url.slice(1)));
+      res.writeHead(200, 'Content-Type', 'text/html');
+      res.write(file);
+      res.end();
+    } catch(err) {
+      const file = fs.readFileSync('./pages/404.html');
+      res.writeHead(404, 'Content-Type', 'text/html');
+      res.write(file);
+      res.end();
+    }
   }
 });
 
