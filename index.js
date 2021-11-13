@@ -1,34 +1,38 @@
-const https = require('http');
-const fs = require('fs');
+const express = require('express');
+const path = require('path');
 
+const app = express();
 const port = 3000;
 
-const server = https.createServer((req, res) => {
-  if (req.url === '/' || req.url.includes('index.html')) {
-    const file = fs.readFileSync('./pages/index.html');
-    res.writeHead(200, 'Content-Type', 'text/html');
-    res.write(file);
-    res.end();
-  } else if (req.url.includes('css')) {
-    const file = fs.readFileSync('.' + req.url);
-    res.writeHead(200, 'Content-Type', 'text/css');
-    res.write(file);
-    res.end();
-  } else {
-    try {
-      const file = fs.readFileSync('./pages/' + (req.url.slice(1)));
-      res.writeHead(200, 'Content-Type', 'text/html');
-      res.write(file);
-      res.end();
-    } catch(err) {
-      const file = fs.readFileSync('./pages/404.html');
-      res.writeHead(404, 'Content-Type', 'text/html');
-      res.write(file);
-      res.end();
-    }
-  }
-});
+function serveIndex(req, res) {
+  res.sendFile(path.join(__dirname, '/pages/index.html'));
+}
 
-server.listen(port, () => {
+function serveAbout(req, res) {
+  res.sendFile(path.join(__dirname, '/pages/about.html'));
+}
+
+function serveContact(req, res) {
+  res.sendFile(path.join(__dirname, '/pages/contact-me.html'));
+}
+
+function serve404(req, res) {
+  res.sendFile(path.join(__dirname, '/pages/404.html'));
+}
+
+function serveCSS(req, res) {
+  res.sendFile(path.join(__dirname, '/assets/style.css'));
+}
+
+app.get('/', serveIndex);
+app.get('/index', serveIndex);
+app.get('/about', serveAbout);
+app.get('/contact-me', serveContact);
+app.get('/assets/style.css', serveCSS);
+
+// If no middleware of routes can be used, 404
+app.use(serve404);
+
+app.listen(port, () => {
   console.log(`Server running at port ${port}`);
 });
